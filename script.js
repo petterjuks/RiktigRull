@@ -151,60 +151,66 @@ function visToppliste() {
 
     const harTilbud = d.forPris !== null;
 
-li.innerHTML = `
-  <div class="kort-wrapper">
+    li.innerHTML = `
+      <div class="kort-wrapper">
 
-    <div class="venstre">
-      <div class="butikk-rad">
-        <span class="butikk">${d.butikk.toUpperCase()}</span>
-        ${harTilbud ? `<span class="tilbud-tag">TILBUD</span>` : ""}
+        <div class="venstre">
+          <div class="butikk-rad">
+            <span class="butikk">${d.butikk.toUpperCase()}</span>
+            ${harTilbud ? `<span class="tilbud-tag">TILBUD</span>` : ""}
+          </div>
+
+          <div class="produkt-rad">
+            <span class="plass">${i + 1}.</span>
+            <span class="navn">${d.navn}</span>
+          </div>
+
+          <div class="meter">
+            ${d.prisPer100m.toFixed(2)} kr / 100m
+          </div>
+        </div>
+
+        <div class="høyre">
+          ${harTilbud ? `<div class="for-pris">${d.forPris.toFixed(2)}</div>` : ""}
+          <div class="nå-pris">${d.pris.toFixed(2)}</div>
+        </div>
+
       </div>
 
-      <div class="produkt-rad">
-        <span class="plass">${i + 1}.</span>
-        <span class="navn">${d.navn}</span>
+      <div class="detaljer">
+        ${d.bilde ? `
+          <div class="produktbilde">
+            <img src="${d.bilde}" alt="${d.navn}" loading="lazy">
+          </div>
+        ` : ""}
+
+        <div class="detaljinfo">
+          <div>🧻 ${d.lag} lag</div>
+          <div>📏 ${d.meter.toFixed(1)} meter</div>
+          <div>💰 ${d.prisPer100m.toFixed(2)} kr / 100m</div>
+        </div>
       </div>
+    `;
 
-      <div class="meter">
-        ${d.prisPer100m.toFixed(2)} kr / 100m
-      </div>
-    </div>
+    // Klikk-event
+    li.addEventListener("click", () => {
+      document.querySelectorAll("#toppliste li").forEach(el => {
+        if (el !== li) el.classList.remove("åpen");
+      });
+      li.classList.toggle("åpen");
 
-    <div class="høyre">
-      ${harTilbud ? `<div class="for-pris">${d.forPris.toFixed(2)}</div>` : ""}
-      <div class="nå-pris">${d.pris.toFixed(2)}</div>
-    </div>
+      // Vibrasjon (mobil)
+      if (navigator.vibrate) navigator.vibrate(30);
 
-  </div>
-
-  <div class="detaljer">
-    ${d.bilde ? `
-      <div class="produktbilde">
-        <img src="${d.bilde}" alt="${d.navn}">
-      </div>
-    ` : ""}
-
-    <div class="detaljinfo">
-      <div>🧻 ${d.lag} lag</div>
-      <div>📏 ${d.meter.toFixed(1)} meter</div>
-      <div>💰 ${d.prisPer100m.toFixed(2)} kr / 100m</div>
-    </div>
-  </div>
-`;
-
-li.addEventListener("click", () => {
-  document.querySelectorAll("#toppliste li").forEach(el => {
-    if (el !== li) el.classList.remove("åpen");
-  });
-
-  li.classList.toggle("åpen");
-});
-
-
+      // Trykkanimasjon
+      li.classList.add("trykk");
+      setTimeout(() => li.classList.remove("trykk"), 150);
+    });
 
     ul.appendChild(li);
   });
 }
+
 
 // ===============================
 // Ukens beste kjøp
@@ -223,17 +229,17 @@ function visUkensKupp() {
   container.innerHTML = `
     <div class="ukens-wrapper">
 
-      <div class="ukens-venstre">
-        <div class="ukens-label">UKENS BESTE KJØP</div>
-        <div class="ukens-navn">${ukensKupp.navn}</div>
-        <div class="ukens-butikk">${ukensKupp.butikk.toUpperCase()}</div>
+ <div class="ukens-venstre">
+  <div class="ukens-label">UKENS KUPP</div>
+  <div class="ukens-navn">${ukensKupp.navn}</div>
+  <div class="ukens-butikk">${ukensKupp.butikk.toUpperCase()}</div>
 
-        ${ukensKupp.bilde ? `
-          <div class="ukens-bilde">
-            <img src="${ukensKupp.bilde}" alt="${ukensKupp.navn}">
-          </div>
-        ` : ""}
-      </div>
+  ${ukensKupp.bilde ? `
+    <div class="ukens-bilde">
+      <img src="${ukensKupp.bilde}" alt="${ukensKupp.navn}">
+    </div>
+  ` : ""}
+</div>
 
       <div class="ukens-høyre">
         ${harTilbud ? `<div class="for-pris">${ukensKupp.forPris.toFixed(2)}</div>` : ""}
