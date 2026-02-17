@@ -192,22 +192,24 @@ function visToppliste() {
       </div>
     `;
 
-    // Klikk-event
-    li.addEventListener("click", () => {
-      document.querySelectorAll("#toppliste li").forEach(el => {
-        if (el !== li) el.classList.remove("åpen");
-      });
-      li.classList.toggle("åpen");
+   // Klikk-event
+li.addEventListener("click", () => {
+  // Lukk andre kort
+  document.querySelectorAll("#toppliste li").forEach(el => {
+    if (el !== li) el.classList.remove("åpen");
+  });
 
-      // Vibrasjon (mobil)
-      if (navigator.vibrate) navigator.vibrate(30);
+  // Åpne/lukk detaljer for dette kortet
+  li.classList.toggle("åpen");
 
-      // Trykkanimasjon
-      li.classList.add("trykk");
-      setTimeout(() => li.classList.remove("trykk"), 150);
-    });
+  // Haptic feedback (kort vibrasjon på mobil)
+  if (navigator.vibrate) {
+    navigator.vibrate(30); // 30 ms "tap"
+  }
+});
 
-    ul.appendChild(li);
+ul.appendChild(li);
+
   });
 }
 
