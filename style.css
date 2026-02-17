@@ -101,6 +101,7 @@ body {
   justify-content: flex-end;
    align-items: center; /* sentrer innhold horisontalt */
   text-align: center;  /* sentrer tekst */
+  margin-bottom: 2rem;
 }
 
 .ukens-høyre .for-pris {
@@ -258,10 +259,8 @@ body {
   margin-top: 1rem;
 }
 
-#toppliste li.trykk {
-  transform: scale(0.985);
-  transition: transform 0.10s ease;
-}
+
+
 .produktbilde img {
   width: 100%;
   max-width: 180px;
