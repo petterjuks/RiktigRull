@@ -276,3 +276,15 @@ body {
 html {
   scroll-behavior: smooth;
 }
+
+/* Skjul scrollbar i Safari / iOS */
+body::-webkit-scrollbar {
+  display: none;
+}
+
+/* Skjul scrollbar i andre nettlesere */
+body {
+  -ms-overflow-style: none;  /* IE/Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
