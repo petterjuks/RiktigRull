@@ -30,7 +30,7 @@ body {
 }
 
 .filter-knapp {
-  background: #919191;
+  background: #cacaca;
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 4px;
@@ -43,8 +43,8 @@ body {
 }
 
 .filter-knapp.aktiv {
-  background: #d8d8d8;
-  color: #000000;
+  background: #616161;
+  color: #c7c7c7;
 }
 
 /* ===================================
@@ -287,4 +287,3 @@ body {
   -ms-overflow-style: none;  /* IE/Edge */
   scrollbar-width: none;     /* Firefox */
 }
-
