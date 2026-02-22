@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RiktigRull – Dopapir på tilbud</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/Dopapir 192.png" />
+</head>
+
+<body>
+  <div class="app">
+
+    <div class="sticky-bar">
+  <div class="sticky-inner">
+    
+    <div class="brand">
+      <h1 class="title">RiktigRull</h1>
+      <p class="tagline">Bedre rull, mindre tull</p>
+    </div>
+
+    <label class="toggle" aria-label="Bare tilbud">
+      <span class="toggle-text">BARE TILBUD</span>
+      <input type="checkbox" id="tilbudToggle">
+      <span class="toggle-track">
+        <span class="toggle-knob"></span>
+      </span>
+    </label>
+
+  </div>
+</div>
+    </div>
+
+    <div id="ukens-kupp"></div>
+
+    <ul id="toppliste"></ul>
+
+    <p id="sist-oppdatert"></p>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

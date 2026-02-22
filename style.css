@@ -1,0 +1,482 @@
+/* ===================================
+   Base
+=================================== */
+:root{
+  --bg: #f5f5f5;
+  --card: #ffffff;
+  --text: #111;
+  --muted: #777;
+  --line: rgba(0,0,0,0.08);
+  --shadow: 0 6px 14px rgba(0,0,0,0.05);
+  --radius: 24px;
+}
+
+html{ scroll-behavior: smooth; }
+html {
+  scrollbar-gutter: stable;
+}
+
+body{
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  background: var(--bg);
+  margin: 0;
+  padding: 1rem;
+  color: var(--text);
+  font-size: 16px;
+  -ms-overflow-style: none;  /* IE/Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+body::-webkit-scrollbar{ display:none; } /* Safari/Chrome */
+
+.app{
+  max-width: 100vw;
+  margin: 0 auto;
+  padding: 0.4rem;
+}
+
+/* ===================================
+   Sticky header (matcher din HTML: .header + switch)
+=================================== */
+.sticky-bar{
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  background: rgba(242,242,242,0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding-top: env(safe-area-inset-top);
+}
+
+.sticky-inner{
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.header h1{
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+  line-height: 1.1;
+}
+
+.header p{
+  margin: 4px 0 0;
+  font-size: 13px;
+  opacity: 0.75;
+  line-height: 1.2;
+}
+
+/* Toggle label + switch wrapper */
+.tilbud-toggle{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tilbud-label{
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+/* iOS-style switch */
+.switch{
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 28px;
+}
+
+.switch input{
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider{
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: rgba(0,0,0,0.15);
+  border-radius: 999px;
+  transition: 0.2s;
+}
+
+.slider:before{
+  content: "";
+  position: absolute;
+  height: 22px;
+  width: 22px;
+  left: 3px;
+  top: 3px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.18);
+  transition: 0.2s;
+}
+
+/* ON state */
+.switch input:checked + .slider{
+  background: #111; /* bytt til grønn om du vil */
+}
+.switch input:checked + .slider:before{
+  transform: translateX(18px);
+}
+
+/* Fokus (tastatur) */
+.switch input:focus-visible + .slider{
+  outline: 2px solid rgba(0,0,0,0.35);
+  outline-offset: 3px;
+}
+
+/* Litt strammere på små skjermer */
+@media (max-width: 420px){
+  .header p{ display:none; }
+  .sticky-inner{ padding: 12px 14px; }
+}
+
+/* ===================================
+   Ukens kupp
+=================================== */
+#ukens-kupp{
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 1.8rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.ukens-wrapper{
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+.ukens-venstre{
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.ukens-label{ font-size: 1.5rem; }
+.ukens-navn{ font-size: 1.3rem; }
+.ukens-butikk{
+  font-size: 1rem;
+  margin-bottom: 0.8rem;
+}
+
+.ukens-bilde{ margin-top: auto; }
+.ukens-bilde img{
+  width: 100%;
+  max-width: 200px;
+}
+
+.ukens-høyre{
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  text-align: center;
+}
+
+.ukens-høyre .for-pris{
+  text-decoration: line-through;
+  color: #ff3b30;
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin-bottom: -0.3rem;
+}
+
+.ukens-høyre .nå-pris{
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.ukens-høyre .meter{
+  font-size: 1.1rem;
+  letter-spacing: -0.025rem;
+  font-weight: 500;
+}
+
+.rabatt-badge{
+  background: #ff5757;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  margin-bottom: 0.5rem;
+  display: inline-block;
+}
+
+/* ===================================
+   Toppliste
+=================================== */
+#toppliste{
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#toppliste li{
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+}
+
+.kort-wrapper{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.venstre{
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+/* Butikk + tilbud */
+.butikk-rad{
+  display: flex;
+  gap: 0.6rem;
+  align-items: baseline;
+  margin-top: 0.2rem;
+  margin-left: 1.7rem; /* linjer opp med navnet */
+}
+
+.butikk{
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+}
+
+.tilbud-tag{
+  background: #ff5757;
+  color: #000;
+  font-size: 0.7rem;
+  padding: 0.2rem 0.45rem;
+  border-radius: 4px;
+}
+
+/* Produktlinje */
+.plass{
+  font-size: 1.3rem;
+  font-weight: 600;
+  flex-shrink: 0;
+  padding-right: 0.5rem;
+}
+
+.navn{
+  font-size: 1.3rem;
+  font-weight: 400;
+  flex: 1;
+}
+
+.produkt-rad + .meter{
+  display: block;
+  margin-left: 1.7rem;
+  font-size: 0.85rem;
+  color: #333;
+}
+
+.meter{
+  font-size: 0.85rem;
+  color: #333;
+}
+
+/* Prisblokk høyre */
+.høyre{
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.høyre .for-pris{
+  text-decoration: line-through;
+  color: #ff5757;
+  font-size: 0.95rem;
+}
+
+.høyre .nå-pris{
+  font-size: 1.3rem;
+  font-weight: 500;
+}
+
+/* ===================================
+   Detaljer (expand/collapse)
+=================================== */
+.detaljer{
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: all 0.35s ease;
+  margin-top: 0;
+}
+
+#toppliste li.åpen .detaljer{
+  max-height: 700px;
+  opacity: 1;
+  margin-top: 1rem;
+}
+
+.produktbilde img{
+  width: 100%;
+  max-width: 180px;
+  margin: 1rem auto;
+  display: block;
+}
+
+/* Spec tables */
+.spec-table{
+  display: grid;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(0,0,0,0.02);
+}
+
+.spec-row{
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  padding: 0.65rem 0.75rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.95rem;
+}
+
+.spec-row:first-child{ border-top: none; }
+
+.spec-label{ color: #444; }
+.spec-value{
+  color: #111;
+  font-weight: 600;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.spec-divider{
+  height: 1px;
+  background: rgba(0,0,0,0.12);
+  margin: 0.75rem 0;
+}
+
+.score-debug{
+  margin-top: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed rgba(0,0,0,0.15);
+  font-size: 0.75rem;
+  color: #888;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Sticky, men "usynlig" (matcher resten av siden) */
+.sticky-bar{
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  background: transparent;
+  padding-top: env(safe-area-inset-top);
+}
+
+.sticky-inner{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  /* samme look som kort */
+  background: #fff;
+  border-radius: 24px;
+  padding: 20px 14px;
+  margin: 0 0 14px 0;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.05);
+}
+
+.title{
+  margin: 0;
+  font-size: 26px;
+  font-weight: 400;
+  letter-spacing: -0.2px;
+}
+
+.tagline{
+  margin: 4px 0 0;
+  font-size: 15px;
+  font-weight: 500;
+  opacity: 0.65;
+  letter-spacing: 0.1px;
+}
+
+/* Toggle = ren, liten, passer inn i kort */
+.toggle{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.toggle-text{
+  font-size: 15px;
+  font-weight: 500;
+  color: #111;
+  opacity: 0.8;
+}
+
+.toggle input{
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.toggle-track{
+  width: 42px;
+  height: 24px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.14);
+  position: relative;
+  transition: 180ms ease;
+}
+
+.toggle-knob{
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.16);
+  transition: 180ms ease;
+}
+
+.toggle input:checked + .toggle-track{
+  background: #16a34a; /* evt #16a34a */
+}
+
+.toggle input:checked + .toggle-track .toggle-knob{
+  transform: translateX(18px);
+}
+
+/* ===================================
+   Footer text
+=================================== */
+#sist-oppdatert{
+  text-align: center;
+  margin-top: 2rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
