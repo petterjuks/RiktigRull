@@ -1,4 +1,19 @@
 // ===============================
+// Konfig
+// ===============================
+const SHEET_CSV_URL =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vQuKd8HZGg_vIEwLb0phrIq6-4qLo_ZkFLbOXCwoWSy0LHoC0MFyp6KWeJldIW8BcB9E7Y8cAa5hkxU/pub?output=csv";
+
+// Sett til false før lansering
+let visScoreDebug = true;
+
+// ===============================
+// Global state
+// ===============================
+let dopapirListe = [];
+let bareTilbud = false;
+
+// ===============================
 // Lager dopapir-objekt
 // ===============================
 function lagDopapir({
@@ -7,7 +22,7 @@ function lagDopapir({
   pris,
   meter,              // total meter i pakken
   lag,
-  ruller = null,      // anbefalt å fylle inn
+  ruller = null,      // anbefalt
   arkPerRull = null,  // valgfritt
   vektPerRullG = null,// valgfritt
   forPris = null,
@@ -37,7 +52,6 @@ function lagDopapir({
     prisPerRull,
     prisPer100m,
     rabattProsent,
-    // settes senere (etter normalisering)
     valueScore: 0,
     dealScore: 0,
     bilde
@@ -45,163 +59,9 @@ function lagDopapir({
 }
 
 // ===============================
-// Database
+// Score-beregning
 // ===============================
-
-/*
-
-function lagDopapir({
-  navn,
-  butikk,
-  pris,
-  meter,              // total meter i pakken
-  lag,
-  ruller = null,      // anbefalt å fylle inn
-  arkPerRull = null,  // valgfritt
-  vektPerRullG = null,// valgfritt
-  forPris = null,
-  bilde = null
-}) 
-
-  */
-
-const dopapirListe = [
-  lagDopapir({
-    navn: "Super Soft 24-pk",
-    butikk: "Europris",
-    pris: 119,
-    meter: 528,
-    lag: 3,
-    bilde: "images/supersoft-24pk.webp"
-  }),
-
-  lagDopapir({
-    navn: "Veltie 18-pk",
-    butikk: "Europris",
-    pris: 89.90,
-    meter: 329,
-    lag: 3,
-    bilde: "images/veltie-18pk.webp"
-  }),
-
-  lagDopapir({
-    navn: "Delicate 16-pk",
-    butikk: "Europris",
-    pris: 70.90,
-    meter: 304,
-    lag: 3,
-    bilde: "images/delicate-16pk.webp"
-  }),
-
-  lagDopapir({
-    navn: "Veltie 32-pk",
-    butikk: "Europris",
-    pris: 120,
-    meter: 528,
-    lag: 3,
-    bilde: "images/veltie-32pk.webp"
-  }),
-
-  lagDopapir({
-    navn: "Lambi 16-pk",
-    butikk: "Europris",
-    pris: 62.90,
-    meter: 300.8,
-    lag: 3,
-    forPris:79.90,
-    bilde: "images/lambi-16pk.webp"
-  }),
-
-  lagDopapir({
-    navn: "Super Soft 6-pk",
-    butikk: "Europris",
-    pris: 39.90,
-    meter: 132,
-    lag: 3,
-    bilde: "images/supersoft-6pk.webp"
-  }),
-
-  lagDopapir({
-    navn: "Lambi 24-pk",
-    butikk: "Coop",
-    pris: 144.40,
-    meter: 494.4,
-    lag: 3,
-    bilde: "images/lambi-24pk.jpg"
-  }),
-
-  lagDopapir({
-    navn: "Lambi 12-pk",
-    butikk: "Spar",
-    pris: 109,
-    meter: 247.2,
-    lag: 3,
-    bilde: "images/lambi-12pk.jpg"
-  }),
-
-  lagDopapir({
-    navn: "Unik soft 16-pk",
-    butikk: "Spar",
-    pris: 79.90,
-    meter: 320,
-    lag: 3,
-    bilde: "images/unik-16pk.webp"
-  }),
-
-  lagDopapir({
-    navn: "Toalettpapir 24-pk",
-    butikk: "REMA 1000",
-    pris: 117.90,
-    meter: 458.4,
-    lag: 3,
-    ruller:24,
-    arkPerRull:153,
-    vektPerRullG:89.5,
-    bilde: "images/toalettpapir-24pk.avif"
-  }),
-
-    lagDopapir({
-    navn: "Unik Soft 8pk",
-    butikk: "Kiwi",
-    pris: 39.90,
-    meter: 171.2,
-    lag: 3,
-    ruller: 8,
-    arkPerRull: 171,
-    vektPerRullG: 104,
-    bilde: "images/unik-8pk.webp"
-  }),
-
-    lagDopapir({
-    navn: "Comfort Lotus 16pk",
-    butikk: "Kiwi",
-    pris: 59.90,
-    meter: 295.2,
-    lag: 3,
-    ruller:16,
-    arkPerRull:150,
-    vektPerRullG:92,
-    bilde: "images/lotus-16pk.webp"
-  }),
-   
-    lagDopapir({
-    navn: "Coop Toalettpapir 16pk",
-    butikk: "Coop",
-    pris: 70.90,
-    meter: 353.6,
-    lag: 3,
-    ruller: 16,
-    arkPerRull: 177,
-    vektPerRullG: 97.2,
-    bilde: "images/coop-16pk.jpg"
-  }),
-
-];
-
-beregnScores(dopapirListe);
-
 function beregnScores(liste) {
-  // Hjelper: max av en verdi, men ignorer null/undefined
   const maxOf = (arr, fn) => {
     let m = 0;
     for (const x of arr) {
@@ -210,24 +70,25 @@ function beregnScores(liste) {
         if (v > m) m = v;
       }
     }
-    return m || 1; // unngå deling på 0
+    return m || 1;
   };
 
-  // Basemetrikker vi normaliserer mot
-  const maxMeterPerKrone = maxOf(liste, d => d.meter / d.pris);              // verdi
-  const maxMeterPerRull  = maxOf(liste, d => d.meterPerRull);               // komfort
+  const safe01 = (x) => (Number.isFinite(x) ? x : null);
+
+  const maxMeterPerKrone = maxOf(liste, d => d.meter / d.pris);
+  const maxMeterPerRull  = maxOf(liste, d => d.meterPerRull);
   const maxLag           = maxOf(liste, d => d.lag);
   const maxArkPerRull    = maxOf(liste, d => d.arkPerRull);
   const maxVektPerRull   = maxOf(liste, d => d.vektPerRullG);
   const maxRabatt        = maxOf(liste, d => d.rabattProsent);
 
-  // Vekter (kan tweakes)
+  // Vekter
   const WEIGHTS_VALUE = {
     meterPerKrone: 0.80,
     meterPerRull:  0.10,
     lag:           0.08,
-    arkPerRull:    0.02, // valgfri bonus
-    vektPerRull:   0.00  // valgfri bonus (brukes bare når oppgitt)
+    arkPerRull:    0.02,
+    vektPerRull:   0.00
   };
 
   const WEIGHTS_DEAL = {
@@ -236,16 +97,14 @@ function beregnScores(liste) {
   };
 
   for (const d of liste) {
-    // Normaliserte delscore (0..1)
     const parts = {
-      meterPerKrone: (d.meter / d.pris) / maxMeterPerKrone,
-      meterPerRull:  d.meterPerRull ? (d.meterPerRull / maxMeterPerRull) : null,
-      lag:           d.lag / maxLag,
-      arkPerRull:    (d.arkPerRull !== null) ? (d.arkPerRull / maxArkPerRull) : null,
-      vektPerRull:   (d.vektPerRullG !== null) ? (d.vektPerRullG / maxVektPerRull) : null
+      meterPerKrone: safe01((d.meter / d.pris) / maxMeterPerKrone),
+      meterPerRull:  d.meterPerRull ? safe01(d.meterPerRull / maxMeterPerRull) : null,
+      lag:           safe01(d.lag / maxLag),
+      arkPerRull:    (d.arkPerRull !== null) ? safe01(d.arkPerRull / maxArkPerRull) : null,
+      vektPerRull:   (d.vektPerRullG !== null) ? safe01(d.vektPerRullG / maxVektPerRull) : null
     };
 
-    // Renormaliser vekter basert på hvilke deler som finnes
     let weightSum = 0;
     for (const key of Object.keys(WEIGHTS_VALUE)) {
       if (parts[key] !== null) weightSum += WEIGHTS_VALUE[key];
@@ -259,50 +118,148 @@ function beregnScores(liste) {
       }
     }
 
-    // Rabatt score (0..1), hvis ingen rabatt: 0
     const rabattScore = maxRabatt ? (d.rabattProsent / maxRabatt) : 0;
 
-    // Deal score kombinerer value + rabatt
     const dealScore =
       WEIGHTS_DEAL.value * valueScore +
       WEIGHTS_DEAL.rabatt * rabattScore;
 
-    d.valueScore = valueScore;
-    d.dealScore = dealScore;
+    d.valueScore = Number.isFinite(valueScore) ? valueScore : 0;
+    d.dealScore = Number.isFinite(dealScore) ? dealScore : 0;
   }
 
   return liste;
 }
 
 // ===============================
-// Global state
+// Sheets -> CSV parsing
 // ===============================
-let bareTilbud = false;
+function toNumberOrNull(x) {
+  if (x === undefined || x === null) return null;
+  const s = String(x).trim().replace(/\s/g, "").replace(",", ".");
+  if (!s) return null;
+  const n = Number(s);
+  return Number.isFinite(n) ? n : null;
+}
 
-let visScoreDebug = true; // sett til false før lansering
+function parseCSV(text) {
+  // Fjern BOM om den finnes
+  if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+
+  // Autodetekter delimiter
+  const firstLine = text.split(/\r?\n/)[0] || "";
+  const commaCount = (firstLine.match(/,/g) || []).length;
+  const semiCount  = (firstLine.match(/;/g) || []).length;
+  const delimiter = semiCount > commaCount ? ";" : ",";
+
+  const rows = [];
+  let row = [];
+  let cur = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    const next = text[i + 1];
+
+    if (c === '"' && inQuotes && next === '"') {
+      cur += '"';
+      i++;
+      continue;
+    }
+    if (c === '"') {
+      inQuotes = !inQuotes;
+      continue;
+    }
+    if (c === delimiter && !inQuotes) {
+      row.push(cur);
+      cur = "";
+      continue;
+    }
+    if ((c === "\n" || c === "\r") && !inQuotes) {
+      if (cur.length || row.length) {
+        row.push(cur);
+        rows.push(row);
+      }
+      cur = "";
+      row = [];
+      if (c === "\r" && next === "\n") i++;
+      continue;
+    }
+    cur += c;
+  }
+  if (cur.length || row.length) {
+    row.push(cur);
+    rows.push(row);
+  }
+
+  return rows;
+}
+
+async function lastInnProdukterFraSheet() {
+  const res = await fetch(`${SHEET_CSV_URL}&t=${Date.now()}`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Klarte ikke hente CSV fra Google Sheets");
+  const csvText = await res.text();
+
+  const grid = parseCSV(csvText).filter(r => r.some(cell => String(cell).trim() !== ""));
+  if (grid.length < 2) {
+    dopapirListe = [];
+    return;
+  }
+
+  const headers = grid[0].map(h => String(h).trim());
+  const dataRows = grid.slice(1);
+
+  dopapirListe = dataRows
+    .map(r => {
+      const obj = {};
+      headers.forEach((h, i) => obj[h] = (r[i] ?? "").trim());
+      return obj;
+    })
+    .filter(r => r.navn && r.butikk)
+    .map(r => lagDopapir({
+      navn: String(r.navn).trim(),
+      butikk: String(r.butikk).trim(),
+      pris: toNumberOrNull(r.pris),
+      forPris: toNumberOrNull(r.forPris),
+      meter: toNumberOrNull(r.meter),
+      lag: toNumberOrNull(r.lag),
+      ruller: toNumberOrNull(r.ruller),
+      arkPerRull: toNumberOrNull(r.arkPerRull),
+      vektPerRullG: toNumberOrNull(r.vektPerRullG),
+      bilde: r.bilde ? String(r.bilde).trim() : null
+    }))
+    .filter(d => d.pris !== null && d.meter !== null && d.lag !== null);
+
+  // ✅ DENNE var det du manglet:
+  beregnScores(dopapirListe);
+}
+
 // ===============================
-// Hjelpefunksjoner
+// Hjelpefunksjoner (sortering/valg)
 // ===============================
+function erTilbud(d) {
+  return d.forPris !== null && d.forPris > d.pris;
+}
+
 function hentSortertListe() {
   const liste = bareTilbud
-    ? dopapirListe.filter(d => d.forPris !== null)
+    ? dopapirListe.filter(erTilbud)
     : dopapirListe;
 
-  return [...liste].sort((a, b) => b.valueScore - a.valueScore);
+  return [...liste].sort((a, b) => (b.valueScore - a.valueScore));
 }
 
 function hentUkensKupp() {
   const liste = bareTilbud
-    ? dopapirListe.filter(d => d.forPris !== null)
+    ? dopapirListe.filter(erTilbud)
     : dopapirListe;
 
-  // Ukens kupp = høyeste dealScore (verdi + rabatt)
-  const sortert = [...liste].sort((a, b) => b.dealScore - a.dealScore);
+  const sortert = [...liste].sort((a, b) => (b.dealScore - a.dealScore));
   return sortert.length ? sortert[0] : null;
 }
 
 // ===============================
-// Toppliste (NY UI STRUCTURE)
+// UI: Toppliste
 // ===============================
 function visToppliste() {
   const ul = document.getElementById("toppliste");
@@ -314,11 +271,10 @@ function visToppliste() {
     const li = document.createElement("li");
     li.classList.add("kort");
 
-    const harTilbud = d.forPris !== null;
+    const harTilbud = erTilbud(d);
 
     li.innerHTML = `
       <div class="kort-wrapper">
-
         <div class="venstre">
           <div class="butikk-rad">
             <span class="butikk">${d.butikk.toUpperCase()}</span>
@@ -339,7 +295,6 @@ function visToppliste() {
           ${harTilbud ? `<div class="for-pris">${d.forPris.toFixed(2)}</div>` : ""}
           <div class="nå-pris">${d.pris.toFixed(2)}</div>
         </div>
-
       </div>
 
       <div class="detaljer">
@@ -349,95 +304,85 @@ function visToppliste() {
           </div>
         ` : ""}
 
-<div class="detaljinfo">
+        <div class="detaljinfo">
+          <div class="spec-table">
+            <div class="spec-row">
+              <span class="spec-label">Lag</span>
+              <span class="spec-value">${d.lag}</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-label">Ruller</span>
+              <span class="spec-value">${d.ruller ?? "-"}</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-label">Totalt</span>
+              <span class="spec-value">${d.meter.toFixed(1)} m</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-label">Pris</span>
+              <span class="spec-value">${d.prisPer100m.toFixed(2)} kr / 100m</span>
+            </div>
+          </div>
 
-  <div class="spec-table">
-    <div class="spec-row">
-      <span class="spec-label">Lag</span>
-      <span class="spec-value">${d.lag}</span>
-    </div>
+          <div class="spec-divider"></div>
 
-    <div class="spec-row">
-      <span class="spec-label">Ruller</span>
-      <span class="spec-value">${d.ruller ?? "-"}</span>
-    </div>
+          <div class="spec-table">
+            ${d.meterPerRull ? `
+              <div class="spec-row">
+                <span class="spec-label">Meter / rull</span>
+                <span class="spec-value">${d.meterPerRull.toFixed(1)} m</span>
+              </div>
+            ` : ""}
 
-    <div class="spec-row">
-      <span class="spec-label">Totalt</span>
-      <span class="spec-value">${d.meter.toFixed(1)} m</span>
-    </div>
+            ${d.prisPerRull ? `
+              <div class="spec-row">
+                <span class="spec-label">Pris / rull</span>
+                <span class="spec-value">${d.prisPerRull.toFixed(2)} kr</span>
+              </div>
+            ` : ""}
 
-    <div class="spec-row">
-      <span class="spec-label">Pris</span>
-      <span class="spec-value">${d.prisPer100m.toFixed(2)} kr / 100m</span>
-    </div>
-  </div>
+            ${d.arkPerRull !== null ? `
+              <div class="spec-row">
+                <span class="spec-label">Ark / rull</span>
+                <span class="spec-value">${d.arkPerRull}</span>
+              </div>
+            ` : ""}
 
-  <div class="spec-divider"></div>
+            ${d.vektPerRullG !== null ? `
+              <div class="spec-row">
+                <span class="spec-label">Vekt / rull</span>
+                <span class="spec-value">${d.vektPerRullG} g</span>
+              </div>
+            ` : ""}
+          </div>
 
-  <div class="spec-table">
-    ${d.meterPerRull ? `
-      <div class="spec-row">
-        <span class="spec-label">Meter / rull</span>
-        <span class="spec-value">${d.meterPerRull.toFixed(1)} m</span>
+          ${visScoreDebug ? `
+            <div class="score-debug">
+              <div>Value score: ${d.valueScore.toFixed(3)}</div>
+              <div>Deal score: ${d.dealScore.toFixed(3)}</div>
+            </div>
+          ` : ""}
+        </div>
       </div>
-    ` : ""}
-
-    ${d.prisPerRull ? `
-      <div class="spec-row">
-        <span class="spec-label">Pris / rull</span>
-        <span class="spec-value">${d.prisPerRull.toFixed(2)} kr</span>
-      </div>
-    ` : ""}
-
-    ${d.arkPerRull !== null ? `
-      <div class="spec-row">
-        <span class="spec-label">Ark / rull</span>
-        <span class="spec-value">${d.arkPerRull}</span>
-      </div>
-    ` : ""}
-
-    ${d.vektPerRullG !== null ? `
-      <div class="spec-row">
-        <span class="spec-label">Vekt / rull</span>
-        <span class="spec-value">${d.vektPerRullG} g</span>
-      </div>
-    ` : ""}
-  </div>
-
-  ${visScoreDebug ? `
-  <div class="score-debug">
-    <div>Value score: ${d.valueScore.toFixed(3)}</div>
-    <div>Deal score: ${d.dealScore.toFixed(3)}</div>
-  </div>
-` : ""}
-</div>
     `;
 
-   // Klikk-event
-li.addEventListener("click", () => {
-  // Lukk andre kort
-  document.querySelectorAll("#toppliste li").forEach(el => {
-    if (el !== li) el.classList.remove("åpen");
-  });
+    li.addEventListener("click", () => {
+      document.querySelectorAll("#toppliste li").forEach(el => {
+        if (el !== li) el.classList.remove("åpen");
+      });
 
-  // Åpne/lukk detaljer for dette kortet
-  li.classList.toggle("åpen");
+      li.classList.toggle("åpen");
 
-  // Haptic feedback (kort vibrasjon på mobil)
-  if (navigator.vibrate) {
-    navigator.vibrate(30); // 30 ms "tap"
-  }
-});
+      // Vibrasjon fungerer på Android, ikke på iOS (ok å ha uansett)
+      if (navigator.vibrate) navigator.vibrate(30);
+    });
 
-ul.appendChild(li);
-
+    ul.appendChild(li);
   });
 }
 
-
 // ===============================
-// Ukens beste kjøp
+// UI: Ukens kupp
 // ===============================
 function visUkensKupp() {
   const ukensKupp = hentUkensKupp();
@@ -448,47 +393,43 @@ function visUkensKupp() {
     return;
   }
 
-  const harTilbud = ukensKupp.forPris !== null;
+  const harTilbud = erTilbud(ukensKupp);
 
   container.innerHTML = `
     <div class="ukens-wrapper">
+      <div class="ukens-venstre">
+        <div class="ukens-label">UKENS KUPP</div>
+        <div class="ukens-navn">${ukensKupp.navn}</div>
+        <div class="ukens-butikk">${ukensKupp.butikk.toUpperCase()}</div>
 
- <div class="ukens-venstre">
-  <div class="ukens-label">UKENS KUPP</div>
-  <div class="ukens-navn">${ukensKupp.navn}</div>
-  <div class="ukens-butikk">${ukensKupp.butikk.toUpperCase()}</div>
+        ${ukensKupp.bilde ? `
+          <div class="ukens-bilde">
+            <img src="${ukensKupp.bilde}" alt="${ukensKupp.navn}">
+          </div>
+        ` : ""}
+      </div>
 
-  ${ukensKupp.bilde ? `
-    <div class="ukens-bilde">
-      <img src="${ukensKupp.bilde}" alt="${ukensKupp.navn}">
-    </div>
-  ` : ""}
-</div>
+      <div class="ukens-høyre">
+        ${harTilbud ? `
+          <div class="rabatt-badge">
+            -${(ukensKupp.rabattProsent * 100).toFixed(0)}%
+          </div>
+        ` : ""}
 
-<div class="ukens-høyre">
+        ${harTilbud ? `
+          <div class="for-pris">
+            ${ukensKupp.forPris.toFixed(2)} kr
+          </div>
+        ` : ""}
 
-  ${harTilbud ? `
-    <div class="rabatt-badge">
-      -${(ukensKupp.rabattProsent * 100).toFixed(0)}%
-    </div>
-  ` : ""}
+        <div class="nå-pris">
+          ${ukensKupp.pris.toFixed(2)} kr
+        </div>
 
-  ${harTilbud ? `
-    <div class="for-pris">
-      ${ukensKupp.forPris.toFixed(2)} kr
-    </div>
-  ` : ""}
-
-  <div class="nå-pris">
-    ${ukensKupp.pris.toFixed(2)} kr
-  </div>
-
-  <div class="meter">
-    ${ukensKupp.prisPer100m.toFixed(2)} kr / 100m
-  </div>
-
-</div>
-
+        <div class="meter">
+          ${ukensKupp.prisPer100m.toFixed(2)} kr / 100m
+        </div>
+      </div>
     </div>
   `;
 }
@@ -519,8 +460,18 @@ document.getElementById("tilbudToggle")?.addEventListener("click", function () {
 });
 
 // ===============================
-// Init
+// Init (Sheets-basert)
 // ===============================
-visToppliste();
-visUkensKupp();
-visSistOppdatert();
+(async function init() {
+  try {
+    await lastInnProdukterFraSheet();
+  } catch (e) {
+    console.error(e);
+    document.getElementById("ukens-kupp").innerHTML =
+      "<div>Klarte ikke hente produkter akkurat nå.</div>";
+  }
+
+  visToppliste();
+  visUkensKupp();
+  visSistOppdatert();
+})();
